@@ -729,6 +729,27 @@ class QMMMTheory:
                 else:
                     print("mech true", not ready)
                     ashexit()
+        elif self.qm_theory_name == "MLMMTheory":
+            if Grad:
+                if PC:
+                    QMenergy, QMgradient, PCgradient = self.qm_theory.run(current_coords=self.qmcoords,
+                                                                          current_MM_coords=self.pointchargecoords,
+                                                                          MMcharges=self.pointcharges,
+                                                                          qm_elems=current_qmelems, charge=charge, mult=mult,
+                                                                          Grad=True, numcores=numcores)
+                else:
+                    print("'MLMMTheory' requires point charges, i.e. 'Elstat' embedding.")
+                    ashexit()
+            else:
+                if PC:
+                    QMenergy= self.qm_theory.run(current_coords=self.qmcoords,
+                                                 current_MM_coords=self.pointchargecoords,
+                                                 MMcharges=self.pointcharges,
+                                                 qm_elems=current_qmelems, charge=charge, mult=mult,
+                                                 Grad=False, numcores=numcores)
+                else:
+                    print("'MLMMTheory' requires point charges, i.e. 'Elstat' embedding.")
+                    ashexit()
         elif self.qm_theory_name == "None" or self.qm_theory_name == "ZeroTheory":
             print("No QMtheory. Skipping QM calc")
             QMenergy=0.0;self.linkatoms=False;PCgradient=np.array([0.0, 0.0, 0.0])
