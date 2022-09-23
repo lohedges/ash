@@ -904,8 +904,6 @@ class QMMMTheory:
             print_time_rel(CheckpointTime, modulename='QM/MM gradient prepare', moduleindex=2, currprintlevel=self.printlevel, currthreshold=1)
             CheckpointTime = time.time()
 
-            #import sys
-            #sys.exit()
         else:
             #No Grad
             self.QMenergy = QMenergy
