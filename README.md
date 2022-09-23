@@ -7,7 +7,7 @@ Interfaces to popular QM codes: ORCA, xTB, Psi4, PySCF, Dalton, CFour, MRCC.
 
 While ASH is ready to be used in computational chemistry research, it is a young project and there will probably be some issues and bugs to be discovered if you start using it.
 
-**In case of problems:** 
+**In case of problems:**
 Please open an issue on Github and I will try to fix any problems as soon as possible.
 
 
@@ -25,7 +25,7 @@ Ongoing priorities:
 - Write unit tests
 - Rewrite silly old code.
 - Reduce code redundancy.
-- Improve program documentation 
+- Improve program documentation
 
 
 **Example:**
@@ -55,3 +55,13 @@ geomeTRICOptimizer(theory=ORCAcalc,fragment=HF_frag)
 
 
  ```
+
+## ML/MM functionality
+
+To use ML/MM via the [interface_MLMM](interfaces/interface_MLMM.py) module, you'll need to install some
+additional pacakges into your ASH Conda environment.
+
+* [librascal](https://github.com/lab-cosmo/librascal) (Install from source using the instructions in the GitHub README.)
+* `sympy`: `conda install -c conda-forge sympy`
+* `scikit-cosmo`: `conda install -c conda-forge scikit-cosmo`
+* `jax`: `pip install --upgrade "jax[cpu]"` (CPU is fine for demonstration purposes.)
