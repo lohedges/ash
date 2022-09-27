@@ -63,5 +63,4 @@ additional pacakges into your ASH Conda environment.
 
 * [librascal](https://github.com/lab-cosmo/librascal) (Install from source using the instructions in the GitHub README.)
 * `sympy`: `conda install -c conda-forge sympy`
-* `scikit-cosmo`: `conda install -c conda-forge scikit-cosmo`
 * `jax`: `pip install --upgrade "jax[cpu]"` (CPU is fine for demonstration purposes.)
