@@ -1,7 +1,6 @@
-
 <img src="ash-simple-logo-letterbig.png" alt="drawing" width="300" align="right"/>
 
- # ASH: a computational chemistry environment
+# ASH: a computational chemistry environment
 ASH is a Python-based computational chemistry and QM/MM environment, primarily for molecular calculations in the gas phase, explicit solution, crystal or protein environment. Can do single-point calculations, geometry optimizations, surface scans, molecular dynamics, numerical frequencies etc. using a MM, QM or QM/MM Hamiltonian.
 Interfaces to popular QM codes: ORCA, xTB, Psi4, PySCF, Dalton, CFour, MRCC.
 
@@ -51,16 +50,38 @@ ORCAcalc = ORCATheory(orcasimpleinput=input, orcablocks=blocks)
 
 #Call optimizer with ORCAtheory object and fragment as input
 geomeTRICOptimizer(theory=ORCAcalc,fragment=HF_frag)
-
-
-
- ```
+```
 
 ## ML/MM functionality
 
 To use ML/MM via the [interface_MLMM](interfaces/interface_MLMM.py) module, you'll need to install some
-additional pacakges into your ASH Conda environment.
+additional pacakges into your ASH Conda environment. A quick-and-dirty
+environment setup can be performed as follows. (The following assumes that
+you are in the ASH root directory)
 
-* [librascal](https://github.com/lab-cosmo/librascal) (Install from source using the instructions in the GitHub README.)
-* `sympy`: `conda install -c conda-forge sympy`
-* `jax`: `pip install --upgrade "jax[cpu]"` (CPU is fine for demonstration purposes.)
+```sh
+conda create -n ash -c conda-forge -c psi4 -c pyscf geometric openmm julia xtb pdbfixer plumed parmed mdanalysis ase scipy matplotlib psi4 pyscf sympy
+conda activate ash
+./conda_setup_ash.sh
+```
+
+(Make sure that the `PATH` and `LD_LIBRARY_PATH` environment variables within
+the `set_environment_ash.sh` script are updated to reflect your local
+[ORCA](https://www.orcasoftware.de/tutorials_orca/)
+installation.)
+
+Now install the additional dependencies required to enable ML/MM functionality:
+
+* `jax`: (CPU only is fine for demonstration purposes.)
+
+```sh
+pip install --upgrade "jax[cpu]"
+```
+
+* [librascal](https://github.com/lab-cosmo/librascal)
+
+```sh
+git clone https://github.com/lab-cosmo/librascal.git
+cd librascal
+pip install .
+```
