@@ -82,7 +82,12 @@ pip install --upgrade "jax[cpu]"
 
 * [librascal](https://github.com/lab-cosmo/librascal)
 
+This requires access to C++ compiler and the [Eigen](https://www.google.com/search?client=firefox-b-d&q=eigen)
+template library. We recommend installing these into
+your ASH environment to ensure compatibility.
+
 ```sh
+conda install -c conda-forge compilers eigen
 git clone https://github.com/lab-cosmo/librascal.git
 cd librascal
 pip install .
