@@ -56,8 +56,10 @@ geomeTRICOptimizer(theory=ORCAcalc,fragment=HF_frag)
 
 To use ML/MM via the [interface_MLMM](interfaces/interface_MLMM.py) module, you'll need to install some
 additional pacakges into your ASH Conda environment. A quick-and-dirty
-environment setup can be performed as follows. (The following assumes that
-you are in the ASH root directory)
+environment setup can be performed as follows.
+
+(The following assumes that you are in the ASH root directory. We advise
+using a Python 3.9 MiniConda, available [here](https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh).)
 
 ```sh
 conda create -n ash -c conda-forge -c psi4 -c pyscf geometric openmm julia xtb pdbfixer plumed parmed mdanalysis ase scipy matplotlib psi4 pyscf sympy
