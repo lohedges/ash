@@ -62,29 +62,24 @@ environment setup can be performed as follows.
 using a Python 3.9 MiniConda, available [here](https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh).)
 
 ```sh
-conda create -n ash -c conda-forge -c psi4 -c pyscf geometric openmm julia xtb pdbfixer plumed parmed mdanalysis ase scipy matplotlib psi4 pyscf sympy
+conda create -n ash -c conda-forge -c psi4 -c pyscf ase geometric jax julia matplotlib mdanalysis openmm parmed pdbfixer plumed psi4 pyscf scipy sympy xtb
 conda activate ash
 ./conda_setup_ash.sh
 ```
+
+(Note that GPU enabled `jax` is currently unavailable, since the required
+version of `jaxlib` from conda-forge conflicts with other packages in the
+environment.)
 
 (Make sure that the `PATH` and `LD_LIBRARY_PATH` environment variables within
 the `set_environment_ash.sh` script are updated to reflect your local
 [ORCA](https://www.orcasoftware.de/tutorials_orca/)
 installation.)
 
-Now install the additional dependencies required to enable ML/MM functionality:
-
-* `jax`: (CPU only is fine for demonstration purposes.)
-
-```sh
-pip install --upgrade "jax[cpu]"
-```
-
-* [librascal](https://github.com/lab-cosmo/librascal)
-
-This requires access to C++ compiler and the [Eigen](https://www.google.com/search?client=firefox-b-d&q=eigen)
-template library. We recommend installing these into
-your ASH environment to ensure compatibility.
+Now install the additional, non-conda, [librascal](https://github.com/lab-cosmo/librascal) package, which is required for ML/MM
+functionality. This requires access to C++ compiler and the [Eigen](https://www.google.com/search?client=firefox-b-d&q=eigen)
+template library. We recommend installing these into your ASH environment
+to ensure compatibility.
 
 ```sh
 conda install -c conda-forge compilers eigen
