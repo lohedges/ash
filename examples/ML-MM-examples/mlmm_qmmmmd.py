@@ -32,9 +32,8 @@ openmm = OpenMMTheory(
     Amberfiles=True,
     amberprmtopfile=prmfile,
     periodic=True,
-    do_energy_decomposition=True,
-    autoconstraints=None,
-    rigidwater=False
+    autoconstraints="HBonds",
+    rigidwater=True
 )
 
 # Create QM/MM OBJECT by combining QM and MM objects above
@@ -53,8 +52,8 @@ OpenMM_MD(
     fragment=frag,
     theory=qmmmobject,
     timestep=0.002,
-    simulation_time=2,
-    traj_frequency=10,
+    simulation_time=1000000,
+    traj_frequency=1000,
     temperature=300,
     integrator='LangevinMiddleIntegrator',
     coupling_frequency=1
