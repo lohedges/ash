@@ -55,5 +55,6 @@ OpenMM_MD(
     traj_frequency=1000,
     temperature=300,
     integrator='LangevinMiddleIntegrator',
+    datafilename="state.txt",
     coupling_frequency=1
 )
