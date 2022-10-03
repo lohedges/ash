@@ -1,5 +1,4 @@
-# Example showing geometric optimization of an alanine-dipeptide system
-# using ML/MM energies and gradients.
+# Example showing ML/MM molecular dynamics for an alanine-dipeptide system.
 
 from ash import *
 
