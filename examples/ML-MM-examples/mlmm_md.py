@@ -1,4 +1,5 @@
-# Example showing ML/MM molecular dynamics for an alanine-dipeptide system.
+# Example showing geometric optimization of an alanine-dipeptide system
+# using ML/MM energies and gradients.
 
 from ash import *
 
@@ -31,6 +32,7 @@ openmm = OpenMMTheory(
     Amberfiles=True,
     amberprmtopfile=prmfile,
     periodic=True,
+    hydrogenmass=1,
     autoconstraints="HBonds",
     rigidwater=True
 )
@@ -39,7 +41,6 @@ openmm = OpenMMTheory(
 qmmmobject = QMMMTheory(
     qm_theory=mlmm,
     mm_theory=openmm,
-    printlevel=2,
     fragment=frag,
     embedding="Elstat",
     qmatoms=qmatoms,
@@ -51,8 +52,8 @@ OpenMM_MD(
     fragment=frag,
     theory=qmmmobject,
     timestep=0.002,
-    simulation_time=1000000,
-    traj_frequency=1000,
+    simulation_steps=1000000,
+    traj_frequency=100,
     temperature=300,
     integrator='LangevinMiddleIntegrator',
     datafilename="state.txt",
