@@ -749,6 +749,11 @@ class OpenMMTheory:
         self.simulation.context.setPositions(pos)
         print("Coordinates set")
 
+    # Thermaise the OpenMM velocities to a temperature in Kelvin.
+    def set_velocities_to_temperature(self, temperature):
+        print("Thermalizing OpenMM system.")
+        self.simulation.context.setVelocitiesToTemperature(temperature * self.unit.kelvin)
+
     #Add dummy 
     #https://simtk.org/plugins/phpBB/viewtopicPhpbb.php?f=161&t=10049&p=0&start=0&view=&sid=b844250e55b14682fb21b5f66a4d810f
     #https://github.com/openmm/openmm/issues/2262
@@ -3041,6 +3046,8 @@ class OpenMM_MDclass:
         # Setting coordinates of OpenMM object from current fragment.coords
         self.openmmobject.set_positions(self.positions)
         print()
+        # Thermalize the system.
+        self.openmmobject.set_velocities_to_temperature(self.temperature)
         # Run simulation
         # kjmolnm_to_atomic_factor = -49614.752589207
 
