@@ -55,7 +55,9 @@ OpenMM_MD(
     simulation_steps=1000000,
     traj_frequency=100,
     temperature=300,
+    pressure=1,
     integrator='LangevinMiddleIntegrator',
+    barostat="MonteCarloBarostat",
     datafilename="state.txt",
     coupling_frequency=1
 )
