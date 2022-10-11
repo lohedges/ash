@@ -751,7 +751,7 @@ class OpenMMTheory:
 
     # Thermaise the OpenMM velocities to a temperature in Kelvin.
     def set_velocities_to_temperature(self, temperature):
-        print("Thermalizing OpenMM system.")
+        print(f"Thermalizing OpenMM velocities to {temperature} K.")
         self.simulation.context.setVelocitiesToTemperature(temperature * self.unit.kelvin)
 
     #Add dummy 
