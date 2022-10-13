@@ -286,6 +286,10 @@ class MLMMTheory:
         self._z = np.array(self._z)
         self._zid = np.array(self._zid)
 
+        # Set the ORCA engine to None. This can be externally bound to the object
+        # to enable comparisons between ML/MM and QM/MM energies/gradients.
+        self._orca = None
+
     # Match run function of other interface objects.
     def run(self, current_coords=None, charge=None, mult=None,
             current_MM_coords=None, MMcharges=None, qm_elems=None,
@@ -451,6 +455,32 @@ class MLMMTheory:
                         dE_dchi @ dchi_dxyz_bohr.swapaxes(0,1))
         dE_dxyz = dE_dxyz_bohr * ANGSTROM_TO_BOHR
         dE_dpc_xyz = dE_dpc_xyz_bohr * ANGSTROM_TO_BOHR
+
+        # Compare energies and gradients to those obtained by QM/MM with ORCA.
+        if self._orca:
+            if self._printlevel >= 2:
+                print("Comparing ML/MM energies and gradients to QM/MM.")
+
+            qm_energy, qm_gradient, pc_gradient = self._orca.run(current_coords=current_coords,
+                                                                 current_MM_coords=current_MM_coords,
+                                                                 MMcharges=MMcharges,
+                                                                 qm_elems=qm_elems,
+                                                                 charge=charge,
+                                                                 mult=mult,
+                                                                 Grad=True,
+                                                                 PC=True,
+                                                                 numcores=numcores)
+
+            # Compute the difference between the ML/MM and QM energies.
+            delta_E = (E + E_vac) - qm_energy
+
+            # Work out the RMSD of the gradients, both QM and PC.
+            rmsd_qm_grad = np.sqrt(np.mean((qm_gradient - (np.array(dE_dxyz) + grad_vac))**2))
+            rmsd_pc_grad = np.sqrt(np.mean((pc_gradient - np.array(dE_dpc_xyz))**2))
+
+            # Write to file.
+            with open("qmmm_vs_mlmm.txt", "a") as f:
+                f.write(f"{delta_E} {rmsd_qm_grad} {rmsd_pc_grad}\n")
 
         return (E + E_vac, np.array(dE_dxyz) + grad_vac, np.array(dE_dpc_xyz))
 
