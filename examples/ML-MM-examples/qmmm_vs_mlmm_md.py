@@ -67,7 +67,7 @@ OpenMM_MD(
     theory=qmmmobject,
     timestep=0.002,
     simulation_steps=1000000,
-    traj_frequency=100,
+    traj_frequency=1,
     temperature=300,
     pressure=1,
     integrator='LangevinMiddleIntegrator',
