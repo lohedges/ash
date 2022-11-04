@@ -26,7 +26,8 @@ mlmm = MLMMTheory(
     fragment=frag,
     qmatoms=qmatoms,
     in_vacuo_backend="torchani",
-    comparison_frequency=100
+    comparison_frequency=100,
+    numcores=numcores
 )
 
 # Create the OpenMMTheory object.
