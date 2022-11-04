@@ -70,7 +70,7 @@ OpenMM_MD(
     traj_frequency=1,
     temperature=300,
     pressure=1,
-    integrator='LangevinMiddleIntegrator',
+    integrator="LangevinMiddleIntegrator",
     barostat="MonteCarloBarostat",
     datafilename="state.txt",
     coupling_frequency=1

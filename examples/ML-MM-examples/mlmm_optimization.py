@@ -59,7 +59,7 @@ geomeTRICOptimizer(
     ActiveRegion=True,
     actatoms=actatoms,
     maxiter=500,
-    coordsystem='hdlc',
+    coordsystem="hdlc",
     charge=frag.charge,
     mult=frag.mult
 )
