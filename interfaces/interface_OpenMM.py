@@ -3090,7 +3090,7 @@ class OpenMM_MDclass:
                 # Run QM/MM step to get full system QM+PC gradient.
                 # Updates OpenMM object with QM-PC forces
                 self.QM_MM_object.run(current_coords=current_coords, elems=self.fragment.elems, Grad=True,
-                                      exit_after_customexternalforce_update=True, charge=self.charge, mult=self.mult)
+                                      exit_after_customexternalforce_update=True, charge=self.charge, mult=self.mult, step=step)
                 print_time_rel(checkpoint, modulename="QM/MM run", moduleindex=2)
                 # NOTE: Think about energy correction (currently skipped above)
                 # Now take OpenMM step (E+G + displacement etc.)

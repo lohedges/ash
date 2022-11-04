@@ -535,7 +535,7 @@ class QMMMTheory:
 
         return newQMgradient_wo_linkatoms, new_full_PC_gradient
 
-    def run(self, current_coords=None, elems=None, Grad=False, numcores=1, exit_after_customexternalforce_update=False, label=None, charge=None, mult=None):
+    def run(self, current_coords=None, elems=None, Grad=False, numcores=1, exit_after_customexternalforce_update=False, label=None, charge=None, mult=None, step=None):
         module_init_time=time.time()
         CheckpointTime = time.time()
         if self.printlevel >= 2:
@@ -736,7 +736,7 @@ class QMMMTheory:
                                                                           current_MM_coords=self.pointchargecoords,
                                                                           MMcharges=self.pointcharges,
                                                                           qm_elems=current_qmelems, charge=charge, mult=mult,
-                                                                          Grad=True, numcores=numcores)
+                                                                          Grad=True, numcores=numcores, step=step)
                 else:
                     print("'MLMMTheory' requires point charges, i.e. 'Elstat' embedding.")
                     ashexit()

@@ -24,7 +24,9 @@ qmatoms = [x for x in range(0, 22)]
 # Create the ML/MM theory object.
 mlmm = MLMMTheory(
     fragment=frag,
-    qmatoms=qmatoms
+    qmatoms=qmatoms,
+    in_vacuo_backend="torchani",
+    comparison_frequency=100
 )
 
 # Create the OpenMMTheory object.
@@ -51,9 +53,9 @@ qmmmobject = QMMMTheory(
 OpenMM_MD(
     fragment=frag,
     theory=qmmmobject,
-    timestep=0.002,
+    timestep=0.001,
     simulation_steps=1000000,
-    traj_frequency=1,
+    traj_frequency=100,
     temperature=300,
     pressure=1,
     integrator='LangevinMiddleIntegrator',

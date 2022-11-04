@@ -75,6 +75,7 @@ from ash.interfaces.interface_pyscf import PySCFTheory
 from ash.interfaces.interface_MLMM import MLMMTheory
 from ash.interfaces.interface_MRCC import MRCCTheory
 from ash.interfaces.interface_CFour import CFourTheory
+from ash.interfaces.interface_TorchANI import TorchANITheory
 from ash.interfaces.interface_xtb import xTBTheory
 
 # MM: external and internal
@@ -144,7 +145,7 @@ if ash.settings_ash.settings_dict["print_exit_footer"] is True:
     if ash.settings_ash.settings_dict["print_full_timings"] is True:
         atexit.register(ash_header.print_timings)
 
-# Julia dependency. Load in the beginning or not. 
+# Julia dependency. Load in the beginning or not.
 #As both PyJulia and PythonCall are a bit slow to load, it is best to only load when needed (current behaviour)
 if ash.settings_ash.settings_dict["load_julia"] is True:
     try:

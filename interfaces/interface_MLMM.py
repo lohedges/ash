@@ -43,11 +43,14 @@ from rascal.utils import (
     spherical_expansion_reshape
 )
 
+from warnings import warn
+
 from ash.functions.functions_general import (
     ashexit,
     BC
 )
 from  ash.interfaces.interface_ORCA import ORCATheory
+from  ash.interfaces.interface_TorchANI import TorchANITheory
 import ash.modules.module_coords
 
 ANGSTROM_TO_BOHR = 1.88973
@@ -180,9 +183,13 @@ class MLMMTheory:
         **SPHERICAL_EXPANSION_HYPERS_COMMON,
     }
 
+    # Supported backends for calculation of in-vacuo energies of the QM region.
+    _supported_backends = ["orca", "torchani"]
+
     # Follow ASH style for constructor, where required arguments are keywords,
     # rather than positional arguments.
-    def __init__(self, fragment=None, qmatoms=None, printlevel=2, numcores=1):
+    def __init__(self, fragment=None, qmatoms=None, in_vacuo_backend="TorchANI",
+                 comparison_frequency=0, printlevel=2, numcores=1):
         """Constructor.
 
            Parameters
@@ -193,6 +200,15 @@ class MLMMTheory:
 
            qmatoms : [int]
                Indices of atoms in the QM region.
+
+           in_vacuo_backend : str
+               The backend used to compute in-vacuo energies of the QM region.
+               Options are: "ORCA", "TorchANI"
+
+           comparison_frequency : int
+               The frequency at which to compare in-vacuo eneriges and gradients.
+               We compute the delta energy and root mean squared difference in
+               gradients between TorchANI and a reference QM engine (ORCA).
 
            printlevel : int
                Verbosity level.
@@ -218,6 +234,26 @@ class MLMMTheory:
                                  f"fragment with {num_atoms} atoms.")
         self._qmatoms = qmatoms
 
+        if not isinstance(in_vacuo_backend, str):
+            raise TypeError("'in_vacuo_backend' must be of type 'str'.")
+        # Strip whitespace and convert to lower case.
+        in_vacuo_backend = in_vacuo_backend.replace(" ", "").lower()
+        if not in_vacuo_backend in self._supported_backends:
+            raise ValueError(f"'in_vacuo_backend' ({in_vacuo_backend}) not supported. "
+                             f"Valid options are {', '.join(self._supported_backends)}")
+        self._backend = in_vacuo_backend
+
+        if type(comparison_frequency) is not int:
+            raise TypeError("'comparison_frequency' must be of type 'int'.")
+        if comparison_frequency < 0:
+            raise ValueError("'comparison_frequency' must be >= 0.")
+        self._comparison_frequency = comparison_frequency
+
+        # Only make comparison when the backend is TorchANI.
+        if self._backend != "torchani" and self._comparison_frequency > 0:
+            self._comparison_frequency = 0
+            warn("'comparison_frequency' can only be used with 'TorchANI' backend.")
+
         if type(numcores) is not int:
             raise TypeError("'numcores' must be of type 'int'.")
         if numcores < 1:
@@ -227,21 +263,46 @@ class MLMMTheory:
             raise TypeError("'printlevel' must be of type 'int'.")
         self._printlevel = printlevel
 
-        # Try initialising an ORCATheory object for the QM in-vacuo backend.
-        try:
-            # ORCA input.
-            orcainput = "! BLYP 6-31G* TightSCF NoFrozenCore KeepDens"
-            orcablocks = "%MaxCore 1024"
+        # Try initialising an ORCATheory object for the in-vacuo backend.
+        if self._backend == "orca":
+            try:
+                # ORCA input.
+                orcainput = "! BLYP 6-31G* TightSCF NoFrozenCore KeepDens"
+                orcablocks = "%MaxCore 1024"
 
-            # Create the ORCA theory object.
-            self._qm_theory = ORCATheory(
-                    orcasimpleinput=orcainput,
-                    orcablocks=orcablocks,
-                    numcores=numcores,
-                    printlevel=0
+                # Create the ORCA theory object.
+                self._backend_theory = ORCATheory(
+                        orcasimpleinput=orcainput,
+                        orcablocks=orcablocks,
+                        numcores=numcores,
+                        printlevel=0
+                )
+            except:
+                raise Exception("Unable to create ORCATheory object for QM backend!")
+
+        # Use TorchANI to predict in-vacuo energies for the QM region.
+        else:
+            # Create the ML/MM theory object.
+            self._backend_theory = TorchANITheory(
+                fragment=self._fragment,
+                qmatoms=self._qmatoms,
+                printlevel=self._printlevel
             )
-        except:
-            raise Exception("Unable to create ORCATheory object for QM backend!")
+
+            # Create an ORCA theory object to allow comparioons of in-vacuo
+            # energies and gradients.
+            if self._comparison_frequency > 0:
+                # ORCA input.
+                orcainput = "! BLYP 6-31G* TightSCF NoFrozenCore KeepDens"
+                orcablocks = "%MaxCore 1024"
+
+                # Create the ORCA theory object.
+                self._reference_theory = ORCATheory(
+                        orcasimpleinput=orcainput,
+                        orcablocks=orcablocks,
+                        numcores=numcores,
+                        printlevel=0
+                )
 
         # Initialise ML-model attributes.
 
@@ -250,17 +311,17 @@ class MLMMTheory:
         self._a_QEq = self._params["a_QEq"]
         self._a_Thole = self._params["a_Thole"]
         self._k_Z = self._params["k_Z"]
-        self._get_s = \
-            GPRCalculator(self._params["s_ref"],
-                          self._params["ref_soap"],
-                          self._params["n_ref"],
-                          1e-3
+        self._get_s = GPRCalculator(
+            self._params["s_ref"],
+            self._params["ref_soap"],
+            self._params["n_ref"],
+            1e-3
         )
-        self._get_chi = \
-            GPRCalculator(self._params["chi_ref"],
-                          self._params["ref_soap"],
-                          self._params["n_ref"],
-                          1e-3
+        self._get_chi = GPRCalculator(
+            self._params["chi_ref"],
+            self._params["ref_soap"],
+            self._params["n_ref"],
+            1e-3
         )
         self._get_E_with_grad = value_and_grad(self._get_E, argnums=(0, 2, 3, 4))
 
@@ -286,14 +347,10 @@ class MLMMTheory:
         self._z = np.array(self._z)
         self._zid = np.array(self._zid)
 
-        # Set the ORCA engine to None. This can be externally bound to the object
-        # to enable comparisons between ML/MM and QM/MM energies/gradients.
-        self._orca = None
-
     # Match run function of other interface objects.
     def run(self, current_coords=None, charge=None, mult=None,
             current_MM_coords=None, MMcharges=None, qm_elems=None,
-            Grad=False, numcores=None, label=None):
+            Grad=False, numcores=None, label=None, step=None):
         """Calculate the energy and (optionally) gradients.
 
            Parameters
@@ -325,6 +382,9 @@ class MLMMTheory:
 
            label : str
                Job identification string.
+
+           step : int
+               The current integration step. (If running ML/MM MD.)
         """
 
         if self._printlevel >= 2:
@@ -364,6 +424,10 @@ class MLMMTheory:
             if not isinstance(label, str):
                 raise TypeError("'label' must be of type 'str'.")
 
+        if step:
+            if type(step) is not int:
+                raise TypeError("'step' must be of type 'int'.")
+
         try:
             charge = int(charge)
         except:
@@ -388,9 +452,9 @@ class MLMMTheory:
         try:
             if Grad:
                 if self._printlevel >= 2:
-                    print("Calculating in-vacuo energies and gradients using ORCA.")
+                    print(f"Calculating in-vacuo energies and gradients using {self._backend.upper()}.")
 
-                E_vac, grad_vac = self._qm_theory.run(
+                E_vac, grad_vac = self._backend_theory.run(
                         current_coords=current_coords,
                         charge=charge,
                         mult=mult,
@@ -401,9 +465,9 @@ class MLMMTheory:
                 )
             else:
                 if self._printlevel >= 2:
-                    print("Calculating in-vacuo energies using ORCA.")
+                    print(f"Calculating in-vacuo energies using {self._backend.upper()}.")
 
-                E_vac = self._qm_theory.run(
+                E_vac = self._backend_theory.run(
                         current_coords=xyz,
                         charge=self._qm_charge,
                         mult=self._qm_mult,
@@ -413,8 +477,7 @@ class MLMMTheory:
                         label="MLMM in vacuo QM backend."
                 )
         except:
-            raise RuntimeError("Failed to calculate in vacuo energies using "
-                               "ORCATheory backend!")
+            raise RuntimeError("Failed to calculate in vacuo energies using backend!")
 
         if self._printlevel >= 2:
             if Grad:
@@ -457,30 +520,29 @@ class MLMMTheory:
         dE_dpc_xyz = dE_dpc_xyz_bohr * ANGSTROM_TO_BOHR
 
         # Compare energies and gradients to those obtained by QM/MM with ORCA.
-        if self._orca:
+        if step % self._comparison_frequency == 0:
             if self._printlevel >= 2:
-                print("Comparing ML/MM energies and gradients to QM/MM.")
+                print("Comparing ML energies and gradients to QM/MM.")
 
-            qm_energy, qm_gradient, pc_gradient = self._orca.run(current_coords=current_coords,
-                                                                 current_MM_coords=current_MM_coords,
-                                                                 MMcharges=MMcharges,
-                                                                 qm_elems=qm_elems,
-                                                                 charge=charge,
-                                                                 mult=mult,
-                                                                 Grad=True,
-                                                                 PC=True,
-                                                                 numcores=numcores)
+            E_qm_vac, grad_qm_vac = self._reference_theory.run(
+                    current_coords=current_coords,
+                    charge=charge,
+                    mult=mult,
+                    qm_elems=qm_elems,
+                    Grad=True,
+                    numcores=numcores,
+                    label="ORCA in-vacuo reference QM theory."
+            )
 
             # Compute the difference between the ML/MM and QM energies.
-            delta_E = (E + E_vac) - qm_energy
+            delta_E = E_vac - E_qm_vac
 
             # Work out the RMSD of the gradients, both QM and PC.
-            rmsd_qm_grad = np.sqrt(np.mean((qm_gradient - (np.array(dE_dxyz) + grad_vac))**2))
-            rmsd_pc_grad = np.sqrt(np.mean((pc_gradient - np.array(dE_dpc_xyz))**2))
+            rmsd_grad = np.sqrt(np.mean(grad_qm_vac - grad_vac)**2)
 
             # Write to file.
-            with open("qmmm_vs_mlmm.txt", "a") as f:
-                f.write(f"{delta_E} {rmsd_qm_grad} {rmsd_pc_grad}\n")
+            with open("ml_vs_qm.txt", "a") as f:
+                f.write(f"{step} {delta_E} {rmsd_grad}\n")
 
         return (E + E_vac, np.array(dE_dxyz) + grad_vac, np.array(dE_dpc_xyz))
 

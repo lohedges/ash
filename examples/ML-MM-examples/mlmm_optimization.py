@@ -25,7 +25,8 @@ actatoms = qmatoms
 # Create the ML/MM theory object.
 mlmm = MLMMTheory(
     fragment=frag,
-    qmatoms=qmatoms
+    qmatoms=qmatoms,
+    in_vacuo_backend="torchani"
 )
 
 # Create the OpenMMTheory object.
