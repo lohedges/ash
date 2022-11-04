@@ -62,14 +62,22 @@ environment setup can be performed as follows.
 using a Python 3.9 MiniConda, available [here](https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh).)
 
 ```sh
-conda create -n ash -c conda-forge -c psi4 -c pyscf ase geometric jax julia matplotlib mdanalysis openmm parmed pdbfixer plumed psi4 pyscf scipy sympy xtb
+conda create -n ash -c conda-forge -c psi4 -c pyscf ase geometric=0.9.7.2 julia matplotlib mdanalysis openmm parmed pdbfixer plumed psi4 pyscf scipy sympy torchani xtb
 conda activate ash
 ./conda_setup_ash.sh
 ```
 
-(Note that GPU enabled `jax` is currently unavailable, since the required
-version of `jaxlib` from conda-forge conflicts with other packages in the
-environment.)
+Now install `jax`:
+
+```sh
+
+* `jax`: (CPU only is fine for demonstration purposes.)
+```sh
+pip install --upgrade "jax[cpu]"
+```
+
+While this could be installed via conda-forge, there seems to be an issue
+with CPU fallback, which causes a core-dump. (The PyPi version works fine.)
 
 (Make sure that the `PATH` and `LD_LIBRARY_PATH` environment variables within
 the `set_environment_ash.sh` script are updated to reflect your local
