@@ -167,7 +167,7 @@ class MLMMTheory:
     module_dir = os.path.dirname(os.path.abspath(__file__))
 
     # Create the name of the model file.
-    model = os.path.join(module_dir, "mlmm_spinv.mat")
+    model = os.path.join(module_dir, "mlmm_adp.mat")
 
     # ML model parameters. For now we'll hard-code our own model parameters.
     # Could allow the user to specify their own model, but that would require
