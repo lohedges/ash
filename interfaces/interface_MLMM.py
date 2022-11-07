@@ -539,34 +539,35 @@ class MLMMTheory:
         dE_dpc_xyz = dE_dpc_xyz_bohr * ANGSTROM_TO_BOHR
 
         # Compare energies and gradients to those obtained by QM/MM with ORCA.
-        if step % self._comparison_frequency == 0:
-            # Clear the file.
-            if step == 0:
-                with open("ml_vs_qm.txt", "w") as f:
-                    pass
-            else:
-                if self._printlevel >= 2:
-                    print("Comparing ML energies and gradients to QM/MM.")
+        if self._comparison_frequency > 0:
+            if step % self._comparison_frequency == 0:
+                # Clear the file.
+                if step == 0:
+                    with open("ml_vs_qm.txt", "w") as f:
+                        pass
+                else:
+                    if self._printlevel >= 2:
+                        print("Comparing ML energies and gradients to QM/MM.")
 
-                E_qm_vac, grad_qm_vac = self._reference_theory.run(
-                        current_coords=current_coords,
-                        charge=charge,
-                        mult=mult,
-                        qm_elems=qm_elems,
-                        Grad=True,
-                        numcores=numcores,
-                        label="ORCA in-vacuo reference QM theory."
-                )
+                    E_qm_vac, grad_qm_vac = self._reference_theory.run(
+                            current_coords=current_coords,
+                            charge=charge,
+                            mult=mult,
+                            qm_elems=qm_elems,
+                            Grad=True,
+                            numcores=numcores,
+                            label="ORCA in-vacuo reference QM theory."
+                    )
 
-                # Compute the difference between the ML/MM and QM energies.
-                delta_E = E_vac - E_qm_vac
+                    # Compute the difference between the ML/MM and QM energies.
+                    delta_E = E_vac - E_qm_vac
 
-                # Work out the RMSD of the gradients, both QM and PC.
-                rmsd_grad = np.sqrt(np.mean(grad_qm_vac - grad_vac)**2)
+                    # Work out the RMSD of the gradients, both QM and PC.
+                    rmsd_grad = np.sqrt(np.mean(grad_qm_vac - grad_vac)**2)
 
-                # Write to file.
-                with open("ml_vs_qm.txt", "a") as f:
-                    f.write(f"{step} {delta_E} {rmsd_grad}\n")
+                    # Write to file.
+                    with open("ml_vs_qm.txt", "a") as f:
+                        f.write(f"{step} {delta_E} {rmsd_grad}\n")
 
         return (E + E_vac, np.array(dE_dxyz) + grad_vac, np.array(dE_dpc_xyz))
 
