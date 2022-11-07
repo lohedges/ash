@@ -164,15 +164,14 @@ class MLMMTheory:
     # Class attributes.
 
     # Get the directory of this module file.
-    module_dir = os.path.dirname(os.path.abspath(__file__))
+    _module_dir = os.path.dirname(os.path.abspath(__file__))
 
-    # Create the name of the model file.
-    model = os.path.join(module_dir, "mlmm_adp.mat")
+    # Create the name of the default model file.
+    _default_model = os.path.join(_module_dir, "mlmm_adp.mat")
 
     # ML model parameters. For now we'll hard-code our own model parameters.
     # Could allow the user to specify their own model, but that would require
     # the use of consistent hyper-paramters, naming, etc.
-    _params = scipy.io.loadmat(model, squeeze_me=True)
 
     # Model hyper-parameters.
     _hypers = {
@@ -188,7 +187,7 @@ class MLMMTheory:
 
     # Follow ASH style for constructor, where required arguments are keywords,
     # rather than positional arguments.
-    def __init__(self, fragment=None, qmatoms=None, in_vacuo_backend="TorchANI",
+    def __init__(self, fragment=None, qmatoms=None, model=None, in_vacuo_backend="TorchANI",
                  comparison_frequency=0, printlevel=2, numcores=1):
         """Constructor.
 
@@ -200,6 +199,10 @@ class MLMMTheory:
 
            qmatoms : [int]
                Indices of atoms in the QM region.
+
+           model : str
+               Path to the ML model parameter file. If None, then a default
+               model will be used.
 
            in_vacuo_backend : str
                The backend used to compute in-vacuo energies of the QM region.
@@ -234,7 +237,23 @@ class MLMMTheory:
                                  f"fragment with {num_atoms} atoms.")
         self._qmatoms = qmatoms
 
+        if model is not None:
+            if not isinstance(model, str):
+                raise TypeError("'model' must be of type 'str'")
+            if not os.path.exists(model):
+                raise ValueError(f"Unable to locate model file: '{model}'")
+            self._model = model
+        else:
+            self._model = self._default_model
+
+        # Load the model parameters.
+        try:
+            self._params = scipy.io.loadmat(self._model, squeeze_me=True)
+        except:
+            raise ValueError(f"Unable to load model parameters from: '{self._model}'")
+
         if not isinstance(in_vacuo_backend, str):
+
             raise TypeError("'in_vacuo_backend' must be of type 'str'.")
         # Strip whitespace and convert to lower case.
         in_vacuo_backend = in_vacuo_backend.replace(" ", "").lower()
