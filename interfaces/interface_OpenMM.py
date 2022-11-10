@@ -229,6 +229,7 @@ class OpenMMTheory:
 
             self.topology = self.psf.topology
             self.forcefield = self.psf
+            self.topfile = psffile
 
         elif GROMACSfiles is True:
             print("Reading Gromacs files.")
@@ -242,6 +243,7 @@ class OpenMMTheory:
 
                 print("Reading GROMACS topology file:", gromacstopfile)
                 gmx_top = parmed.gromacs.GromacsTopologyFile(gromacstopfile)
+                self.topfile = gromacstopfile
 
                 # Getting PBC parameters
                 gmx_top.box = gmx_gro.box
@@ -355,6 +357,7 @@ class OpenMMTheory:
                           residlabels=residlabels)
             pdb = openmm.app.PDBFile("cluster.pdb")
             self.topology = pdb.topology
+            self.topfile = "cluster.pdb"
 
             self.forcefield = openmm.app.ForceField(xmlfile)
 
@@ -380,6 +383,7 @@ class OpenMMTheory:
             print("Reading topology from PDBfile:", pdbfile)
             pdb = openmm.app.PDBFile(pdbfile)
             self.topology = pdb.topology
+            self.topfile = pdbfile
         # Simple OpenMM system without any forcefield defined. Requires ASH fragment
         # Used for OpenMM_MD with QM Hamiltonian
         elif dummysystem is True:
@@ -390,6 +394,7 @@ class OpenMMTheory:
             #Load PDB-file and create topology
             pdb = openmm.app.PDBFile("frag.pdb")
             self.topology = pdb.topology
+            self.topfile = "frag.pdb"
 
             #Create dummy XML file
             xmlfile = write_xmlfile_nonbonded(filename="dummy.xml", resnames=["DUM"], atomnames_per_res=[atomnames_full], atomtypes_per_res=[fragment.elems],
@@ -408,13 +413,13 @@ class OpenMMTheory:
             # Topology from PDBfile annoyingly enough
             pdb = openmm.app.PDBFile(pdbfile)
             self.topology = pdb.topology
+            self.topfile = pdbfile
             # Todo: support multiple xml file here
             # forcefield = simtk.openmm.app.ForceField('amber14-all.xml', 'amber14/tip3pfb.xml')
             self.forcefield = openmm.app.ForceField(*xmlfiles)
 
             #Defining some things. resids is used by actregiondefine
             self.resids = [i.residue.index for i in self.topology.atoms()]
-
 
 
 
@@ -2707,6 +2712,9 @@ class OpenMM_MDclass:
         elif isinstance(theory, ash.QMMMTheory):
             self.QM_MM_object = theory
             self.openmmobject = theory.mm_theory
+            if barostat is not None:
+                print("QM/MM MD currently only works in NVT ensemble.")
+                ashexit()
 
         #Case: OpenMM with external QM
         else:
@@ -3081,10 +3089,8 @@ class OpenMM_MDclass:
                     )
                     dcd_file.writeModel(coords)
 
-                # Load the state with MDTraj. Here we use the AMBER PRM file
-                # used to create the OpenMM System. We assume AMBER files will
-                # be used, so this will fail if the object was instantiated in
-                # another way.
+                # Load the state with MDTraj. Here we use the topology file
+                # used to create the OpenMM system.
                 traj = mdtraj.load_dcd("state.dcd", top=self.openmmobject.topfile)
 
                 # Image the molecules so that the solute is centered.
