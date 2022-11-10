@@ -609,8 +609,12 @@ class MLMMTheory:
 
     def _get_mu_ind(self, r_data, mesh_data, q, s, q_val, k_Z):
         A = self._get_A_thole(r_data, s, q_val, k_Z)
-        fields = jnp.sum(mesh_data['T1_mesh'] * q[:, None],
-                        axis=1).flatten()
+        
+        r = 1. / mesh_data['T0_mesh']
+        f1 = self._get_f1_slater(r, s[:, None] * 2.)
+        fields = jnp.sum(mesh_data['T1_mesh'] * f1[:, :, None] * q[:, None],
+                         axis=1).flatten()
+        
         mu_ind = jnp.linalg.solve(A, fields)
         E_ind = mu_ind @ fields * 0.5
         return mu_ind.reshape((-1, 3))
@@ -690,6 +694,11 @@ class MLMMTheory:
         return {'T0_mesh': 1. / r,
                 'T0_mesh_slater': cls._get_T0_slater(r, s[:, None]),
                 'T1_mesh': - rr / r[:, :, None] ** 3}
+    
+    @classmethod
+    def _get_f1_slater(cls, r, s):
+        return (cls._get_T0_slater(r, s) * r -
+                jnp.exp(-r / s) / s * (0.5 + r / (s * 2)) * r)
 
     @staticmethod
     def _get_T0_slater(r, s):
