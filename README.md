@@ -62,7 +62,7 @@ environment setup can be performed as follows.
 using a Python 3.9 MiniConda, available [here](https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh).)
 
 ```sh
-conda create -n ash -c conda-forge -c psi4 -c pyscf ase geometric=0.9.7.2 julia matplotlib mdanalysis openmm parmed pdbfixer plumed psi4 pyscf scipy sympy torchani xtb
+conda create -n ash -c conda-forge -c psi4 -c pyscf ase geometric=0.9.7.2 julia matplotlib mdanalysis mdtraj openmm parmed pdbfixer plumed psi4 pyscf scipy sympy torchani xtb
 conda activate ash
 ./conda_setup_ash.sh
 ```

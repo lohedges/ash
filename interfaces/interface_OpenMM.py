@@ -6,6 +6,7 @@ import traceback
 import io
 import copy
 import numpy as np
+import mdtraj
 
 #import ash
 import ash.constants
@@ -280,6 +281,7 @@ class OpenMMTheory:
                 self.prmtop = openmm.app.AmberPrmtopFile(amberprmtopfile)
             self.topology = self.prmtop.topology
             self.forcefield = self.prmtop
+            self.topfile = amberprmtopfile
 
             #List of resids, resnames and mm_elements. Used by actregiondefine
             self.resids = [i.residue.index for i in self.prmtop.topology.atoms()]
@@ -2705,6 +2707,7 @@ class OpenMM_MDclass:
         elif isinstance(theory, ash.QMMMTheory):
             self.QM_MM_object = theory
             self.openmmobject = theory.mm_theory
+
         #Case: OpenMM with external QM
         else:
             #NOTE: Recognize QM theories here ??
@@ -3056,12 +3059,42 @@ class OpenMM_MDclass:
                 checkpoint_begin_step = time.time()
                 checkpoint = time.time()
                 print("Step:", step)
-                #Get state of simulation. Gives access to coords, velocities, forces, energy etc.
-                current_state=self.openmmobject.simulation.context.getState(getPositions=True, enforcePeriodicBox=self.enforcePeriodicBox, getEnergy=True)
+
+                # Get the current simulation state from the context. Use unwrapped
+                # coordiantes, since we will wrap and recenter molecules with MDTraj.
+                current_state = self.openmmobject.simulation.context.getState(
+                    getPositions=True,
+                    enforcePeriodicBox=False,
+                    getEnergy=True
+                )
+
+                # Get the current coordinates.
+                coords = current_state.getPositions()
+
+                # Write a DCD frame for the current state. Note that we use the box
+                # vectors from the topology, so this won't work for NPT simulations.
+                with open("state.dcd", "wb") as file:
+                    dcd_file = self.openmmobject.openmm_app.DCDFile(
+                        file,
+                        self.openmmobject.topology,
+                        dt=1
+                    )
+                    dcd_file.writeModel(coords)
+
+                # Load the state with MDTraj. Here we use the AMBER PRM file
+                # used to create the OpenMM System. We assume AMBER files will
+                # be used, so this will fail if the object was instantiated in
+                # another way.
+                traj = mdtraj.load_dcd("state.dcd", top=self.openmmobject.topfile)
+
+                # Image the molecules so that the solute is centered.
+                traj.image_molecules(inplace=True)
+
+                # Get back a NumPy arrray of the current positions.
+                current_coords = traj.xyz[0].astype("float64") * 10
+
                 print_time_rel(checkpoint, modulename="get OpenMM state", moduleindex=2)
                 checkpoint = time.time()
-                # Get current coordinates from state to use for QM/MM step
-                current_coords = np.array(current_state.getPositions(asNumpy=True))*10
 
                 #TODO: Translate box coordinates so that they are centered on solute
                 #Do manually or use mdtraj, mdanalysis or something??
