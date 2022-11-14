@@ -36,7 +36,7 @@ openmm = OpenMMTheory(
     amberprmtopfile=prmfile,
     periodic=True,
     hydrogenmass=1,
-    autoconstraints="HBonds",
+    autoconstraints=None,
     rigidwater=True
 )
 
