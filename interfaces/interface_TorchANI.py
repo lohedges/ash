@@ -75,7 +75,7 @@ class TorchANITheory:
         self._printlevel = printlevel
 
         # Work out the atomic numbers for the elements in the QM region.
-        # Because ASH pefroms zero self-consistency checks, these could be
+        # Because ASH perfoms zero self-consistency checks, these could be
         # different to those of the qm_elems when the run method is called.
         # We assume that no-one is stupid enough to do this.
         atomic_numbers = []
