@@ -73,7 +73,7 @@ Now install `jax`:
 pip install --upgrade "jax[cpu]"
 ```
 
-(CPU is file for demonstration purposes.)
+(CPU is fine for demonstration purposes.)
 
 While this could be installed via conda-forge, there seems to be an issue
 with CPU fallback, which causes a core-dump. (The PyPi version works fine.)
