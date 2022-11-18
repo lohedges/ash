@@ -23,7 +23,7 @@ environment setup can be performed as follows.
 using a Python 3.9 MiniConda, available [here](https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh).)
 
 ```sh
-conda create ash-lite -c conda-forge pytorch-gpu torchani ipython jaxlib=\*=cuda\* jax openmm mdtraj
+conda create ash-lite -c conda-forge jax jaxlib=\*=cuda\* mdtraj openmm pytorch-gpu torchani
 conda activate ash-lite
 ./conda_setup_ash.sh
 ```
