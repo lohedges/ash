@@ -209,9 +209,10 @@ class MLMMTheory:
                Options are: "ORCA", "TorchANI"
 
            comparison_frequency : int
-               The frequency at which to compare in-vacuo eneriges and gradients.
-               We compute the delta energy and root mean squared difference in
-               gradients between TorchANI and a reference QM engine (ORCA).
+               The frequency at which to compare eneriges and gradients to those
+               computed by a QM engine (ORCA in this case). We compute the delta
+               energy and root mean squared difference in gradients and write to
+               a mlmm_vs_qmmm.txt file.
 
            printlevel : int
                Verbosity level.
@@ -543,31 +544,36 @@ class MLMMTheory:
             if step % self._comparison_frequency == 0:
                 # Clear the file.
                 if step == 0:
-                    with open("ml_vs_qm.txt", "w") as f:
+                    with open("mlmm_vs_qmmm.txt", "w") as f:
                         pass
                 else:
                     if self._printlevel >= 2:
                         print("Comparing ML energies and gradients to QM/MM.")
 
-                    E_qm_vac, grad_qm_vac = self._reference_theory.run(
+                    # Compute the full QM/MM energy and gradients using ORCA.
+                    E_qm, qm_gradient, pc_gradient = self._reference_theory.run(
                             current_coords=current_coords,
+                            current_MM_coords=current_MM_coords,
+                            MMcharges=MMcharges,
+                            qm_elems=qm_elems,
                             charge=charge,
                             mult=mult,
-                            qm_elems=qm_elems,
                             Grad=True,
+                            PC=True,
                             numcores=numcores,
-                            label="ORCA in-vacuo reference QM theory."
+                            label="ORCA QM/MM reference calculation."
                     )
 
                     # Compute the difference between the ML/MM and QM energies.
-                    delta_E = E_vac - E_qm_vac
+                    delta_E = (E + E_vac) - E_qm
 
                     # Work out the RMSD of the gradients, both QM and PC.
-                    rmsd_grad = np.sqrt(np.mean(grad_qm_vac - grad_vac)**2)
+                    rmsd_qm_grad = np.sqrt(np.mean((qm_gradient - (np.array(dE_dxyz) + grad_vac))**2))
+                    rmsd_pc_grad = np.sqrt(np.mean((pc_gradient - np.array(dE_dpc_xyz))**2))
 
                     # Write to file.
-                    with open("ml_vs_qm.txt", "a") as f:
-                        f.write(f"{step} {delta_E} {rmsd_grad}\n")
+                    with open("mlmm_vs_qmmm.txt", "a") as f:
+                        f.write(f"{step} {delta_E} {rmsd_qm_grad} {rmsd_pc_grad}\n")
 
         return (E + E_vac, np.array(dE_dxyz) + grad_vac, np.array(dE_dpc_xyz))
 
