@@ -23,7 +23,7 @@ environment setup can be performed as follows.
 using a Python 3.9 MiniConda, available [here](https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh).)
 
 ```sh
-CONDA_OVERRIDE_CUDA="11.2" conda create ash-lite -c conda-forge jax jaxlib=\*=cuda\* mdtraj openmm pytorch-gpu torchani
+CONDA_OVERRIDE_CUDA="11.2" conda create ash-lite -c conda-forge compilers eigen jax jaxlib=\*=cuda\* mdtraj openmm pytorch-gpu torchani
 conda activate ash-lite
 ./conda_setup_ash.sh
 ```
@@ -40,12 +40,9 @@ your host system along with NVCC, the CUDA compiler driver. (This doesn't come
 with `cudatoolkit` from `conda-forge`.)
 
 Now install the additional, non-conda, [librascal](https://github.com/lab-cosmo/librascal) package, which is required for ML/MM
-functionality. This requires access to C++ compiler and the [Eigen](https://www.google.com/search?client=firefox-b-d&q=eigen)
-template library. We recommend installing these into your ASH environment
-to ensure compatibility.
+functionality.
 
 ```sh
-conda install -c conda-forge compilers eigen
 git clone https://github.com/lab-cosmo/librascal.git
 cd librascal
 pip install .
