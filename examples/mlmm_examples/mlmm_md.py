@@ -57,9 +57,9 @@ OpenMM_MD(
     theory=qmmmobject,
     timestep=0.001,
     simulation_steps=1000000,
-    traj_frequency=100,
+    traj_frequency=1000,
     temperature=300,
-    integrator='LangevinMiddleIntegrator',
+    integrator="LangevinMiddleIntegrator",
     datafilename="state.txt",
     coupling_frequency=1
 )
