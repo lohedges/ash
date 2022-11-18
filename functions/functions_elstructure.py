@@ -10,7 +10,6 @@ import ash.constants
 import ash.modules.module_coords
 import ash.dictionaries_lists
 from ash.functions.functions_general import ashexit, isodd
-import ash.interfaces.interface_ORCA
 from ash.modules.module_coords import nucchargelist
 
 #CM5. from https://github.com/patrickmelix/CM5-calculator/blob/master/cm5calculator.py
@@ -1029,3 +1028,6 @@ def xdm_run(wfxfile=None, postgdir=None,a1=None, a2=None,functional=None):
     print("dispenergy:", dispenergy)
     print("dispgradient:", dispgradient)
     return dispenergy, dispgradient
+
+# Import here to avoid a circular dependency.
+import ash.interfaces.interface_ORCA

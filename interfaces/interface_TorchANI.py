@@ -184,4 +184,4 @@ class TorchANITheory:
         else:
             gradient = torch.autograd.grad(energy.sum(), coords)[0]
 
-            return energy.detach().numpy()[0], gradient.numpy()[0]
+            return energy.detach().cpu().numpy()[0], gradient.cpu().numpy()[0]
