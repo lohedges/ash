@@ -23,10 +23,12 @@ environment setup can be performed as follows.
 using a Python 3.9 MiniConda, available [here](https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh).)
 
 ```sh
-conda create ash-lite -c conda-forge jax jaxlib=\*=cuda\* mdtraj openmm pytorch-gpu torchani
+CONDA_OVERRIDE_CUDA="11.2" conda create ash-lite -c conda-forge jax jaxlib=\*=cuda\* mdtraj openmm pytorch-gpu torchani
 conda activate ash-lite
 ./conda_setup_ash.sh
 ```
+
+If this fails, try using [mamba](https://github.com/mamba-org/mamba) as a replacement for conda.
 
 (If you want to compare ML/MM predictions to those from ORCA, then make sure
 that the `PATH` and `LD_LIBRARY_PATH` environment variables within the
