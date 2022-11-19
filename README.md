@@ -34,17 +34,16 @@ conda activate ash-lite
 
 If this fails, try using [mamba](https://github.com/mamba-org/mamba) as a replacement for conda.
 
-(If you want to compare ML/MM predictions to those from ORCA, then make sure
-that the `PATH` and `LD_LIBRARY_PATH` environment variables within the
-`set_environment_ash.sh` script are updated to reflect your local
-[ORCA](https://www.orcasoftware.de/tutorials_orca/) installation.)
+(If you want to use ORCA as in-vacuo backend for the ML/MM interface, or enable
+comparisons between QM/MM energies computed by ORCA to the ML/MM predictions,
+then make sure that the `PATH` and `LD_LIBRARY_PATH` environment variables within
+the `set_environment_ash.sh` script are updated to reflect your local [ORCA](https://www.orcasoftware.de/tutorials_orca/) installation.)
 
 For GPU functionality, you will need to install appropriate CUDA drivers on
 your host system along with NVCC, the CUDA compiler driver. (This doesn't come
 with `cudatoolkit` from `conda-forge`.)
 
-Now install the additional, non-conda, [librascal](https://github.com/lab-cosmo/librascal) package, which is required for ML/MM
-functionality.
+Now install the additional, non-conda, [librascal](https://github.com/lab-cosmo/librascal) package, which is required for ML/MM functionality.
 
 ```sh
 git clone https://github.com/lab-cosmo/librascal.git
