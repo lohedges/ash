@@ -2,7 +2,7 @@
 
 # ASH-lite: a computational chemistry environment
 
-This is a strpped-down version of [ASH](https://github.com/lohedges/ash) for purposes of demonstrating ML/MM
+This is a pruned version of [ASH](https://github.com/lohedges/ash) for purposes of demonstrating ML/MM
 molecular dynamics with electrostatic embedding. See
 [ML/MM functionality](#mlmm-functionality) for details.
 
