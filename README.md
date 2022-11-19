@@ -2,12 +2,11 @@
 
 # ASH-lite: a computational chemistry environment
 
-This is a pruned version of [ASH](https://github.com/lohedges/ash) for purposes of demonstrating ML/MM
+This is a pruned version of [ASH](https://github.com/RagnarB83/ash) for purposes of demonstrating ML/MM
 molecular dynamics with electrostatic embedding. See
 [ML/MM functionality](#mlmm-functionality) for details.
 
-[ASH](https://github.com/lohedges/ash) is a Python-based computational chemistry and QM/MM environment, primarily
-for molecular calculations in the gas phase, explicit solution, crystal or
+[ASH](https://github.com/RagnarB83/ash) is a Python-based computational chemistry and QM/MM environment, primarily for molecular calculations in the gas phase, explicit solution, crystal or
 protein environment. Can do single-point calculations, geometry optimizations,
 surface scans, molecular dynamics, numerical frequencies etc. using a MM, QM
 or QM/MM Hamiltonian.  Interfaces to popular QM codes: ORCA, xTB, Psi4,
