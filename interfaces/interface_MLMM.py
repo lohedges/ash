@@ -157,16 +157,18 @@ class SOAPCalculatorSpinv:
         return soap, dsoap_dxyz
 
 # ML/MM theory. Predicts ML/MM energies (and gradients) allowing QM/MM with
-# ML/MM embedding. Requires the use of a QM engine to compute in vacuo energies
-# and forces, to which those from the ML/MM model are added. For now we use
-# ORCA as the QM backend, but this could be generalised to any supported engine.
+# ML/MM embedding. Requires the use of a QM (or ML) engine to compute in vacuo
+# energies forces, to which those from the ML/MM model are added. For now we
+# support use of ORCA (QM) or TorchANI (ML) as the backend, but this could
+# be generalised to any supported engine.
 class MLMMTheory:
     # Class attributes.
 
     # Get the directory of this module file.
     _module_dir = os.path.dirname(os.path.abspath(__file__))
 
-    # Create the name of the default model file.
+    # Create the name of the default model file. (This is trained for the
+    # alanine dipeptide (ADP) system.
     _default_model = os.path.join(_module_dir, "mlmm_adp.mat")
 
     # ML model parameters. For now we'll hard-code our own model parameters.
@@ -615,12 +617,12 @@ class MLMMTheory:
 
     def _get_mu_ind(self, r_data, mesh_data, q, s, q_val, k_Z):
         A = self._get_A_thole(r_data, s, q_val, k_Z)
-        
+
         r = 1. / mesh_data['T0_mesh']
         f1 = self._get_f1_slater(r, s[:, None] * 2.)
         fields = jnp.sum(mesh_data['T1_mesh'] * f1[:, :, None] * q[:, None],
                          axis=1).flatten()
-        
+
         mu_ind = jnp.linalg.solve(A, fields)
         E_ind = mu_ind @ fields * 0.5
         return mu_ind.reshape((-1, 3))
@@ -700,7 +702,7 @@ class MLMMTheory:
         return {'T0_mesh': 1. / r,
                 'T0_mesh_slater': cls._get_T0_slater(r, s[:, None]),
                 'T1_mesh': - rr / r[:, :, None] ** 3}
-    
+
     @classmethod
     def _get_f1_slater(cls, r, s):
         return (cls._get_T0_slater(r, s) * r -
