@@ -15,6 +15,10 @@ PySCF, Dalton, CFour, MRCC.
 
 ## ML/MM functionality
 
+Baed on [code](https://github.com/emedio/embedding) by Kirill Zinovjev for the paper
+"Electrostatic Embedding of Machine Learning Potentials", which is available
+[here](https://chemrxiv.org/engage/chemrxiv/article-details/6317807d49042a7e1ccde60f).
+
 To use ML/MM via the [interface_MLMM](interfaces/interface_MLMM.py) module, you'll need to install some
 additional pacakges into your ASH Conda environment. A quick-and-dirty
 environment setup can be performed as follows.
