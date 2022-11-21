@@ -214,7 +214,8 @@ class MLMMTheory:
                The frequency at which to compare eneriges and gradients to those
                computed by a QM engine (ORCA in this case). We compute the delta
                energy and root mean squared difference in gradients and write to
-               a mlmm_vs_qmmm.txt file.
+               a mlmm_vs_qmmm.txt file. (Both for the in-vacuo and full ML/MM
+               components.)
 
            printlevel : int
                Verbosity level.
@@ -547,10 +548,22 @@ class MLMMTheory:
                 # Clear the file.
                 if step == 0:
                     with open("mlmm_vs_qmmm.txt", "w") as f:
+                        f.write("# step delta_energy_qm_vac delta_energy_qmmm rmsd_gradient_qm_vac rmsd_gradient_qm rmsd_gradient_mm\n")
                         pass
                 else:
                     if self._printlevel >= 2:
                         print("Comparing ML energies and gradients to QM/MM.")
+
+                    # Compute the in-vacuo QM energy and gradients using ORCA.
+                    E_qm_vac, qm_gradient_vac = self._reference_theory.run(
+                            current_coords=current_coords,
+                            qm_elems=qm_elems,
+                            charge=charge,
+                            mult=mult,
+                            Grad=True,
+                            numcores=numcores,
+                            label="ORCA in-vacuo QM reference calculation."
+                    )
 
                     # Compute the full QM/MM energy and gradients using ORCA.
                     E_qm, qm_gradient, pc_gradient = self._reference_theory.run(
@@ -568,14 +581,16 @@ class MLMMTheory:
 
                     # Compute the difference between the ML/MM and QM energies.
                     delta_E = (E + E_vac) - E_qm
+                    delta_E_vac = E_vac - E_qm_vac
 
                     # Work out the RMSD of the gradients, both QM and PC.
                     rmsd_qm_grad = np.sqrt(np.mean((qm_gradient - (np.array(dE_dxyz) + grad_vac))**2))
+                    rmsd_grad_vac = np.sqrt(np.mean(qm_gradient_vac - grad_vac)**2)
                     rmsd_pc_grad = np.sqrt(np.mean((pc_gradient - np.array(dE_dpc_xyz))**2))
 
                     # Write to file.
                     with open("mlmm_vs_qmmm.txt", "a") as f:
-                        f.write(f"{step} {delta_E} {rmsd_qm_grad} {rmsd_pc_grad}\n")
+                        f.write(f"{step} {delta_E_vac} {delta_E} {rmsd_grad_vac} {rmsd_qm_grad} {rmsd_pc_grad}\n")
 
         return (E + E_vac, np.array(dE_dxyz) + grad_vac, np.array(dE_dpc_xyz))
 
