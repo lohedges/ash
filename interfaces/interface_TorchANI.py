@@ -172,7 +172,8 @@ class TorchANITheory:
                 raise TypeError("'label' must be of type 'str'.")
 
         # Convert the coordinates to a Torch tensor, casting to 32-bit floats.
-        coords = torch.tensor([np.float32(current_coords)], requires_grad=Grad, device=self._device)
+        # Use a NumPy array, since converting a Python list to a Tensor is slow.
+        coords = torch.tensor(np.array([np.float32(current_coords)]), requires_grad=Grad, device=self._device)
 
         # Compute the energy.
         energy = self._model((self._qm_atomic_numbers, coords)).energies
