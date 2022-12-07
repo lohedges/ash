@@ -26,7 +26,7 @@ environment setup can be performed as follows.
 using a Python 3.9 MiniConda, available [here](https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh).)
 
 ```sh
-CONDA_OVERRIDE_CUDA="11.2" conda create ash-lite -c conda-forge compilers cudatoolkit=11.2 eigen jax jaxlib=\*=cuda\* mdtraj openmm pytorch-gpu torchani
+CONDA_OVERRIDE_CUDA="11.2" conda create ash-lite -c conda-forge compilers cudatoolkit=11.2 cudatoolkit-dev=11.2 eigen jax jaxlib=\*=cuda\* mdtraj openmm pytorch-gpu torchani
 conda activate ash-lite
 ./conda_setup_ash.sh
 ```
