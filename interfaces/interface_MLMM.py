@@ -672,10 +672,6 @@ class MLMMTheory:
     @classmethod
     def _get_r_data(cls, xyz):
         n_atoms = len(xyz)
-        t01 = jnp.zeros((n_atoms, n_atoms))
-        t11 = jnp.zeros((n_atoms, n_atoms * 3))
-        t21 = jnp.zeros((n_atoms * 3, n_atoms * 3))
-        t22 = jnp.zeros((n_atoms * 3, n_atoms * 3))
 
         rr_mat = xyz[:, None, :] - xyz[None, :, :]
 
