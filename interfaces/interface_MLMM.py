@@ -49,8 +49,8 @@ from ash.functions.functions_general import (
     ashexit,
     BC
 )
-from  ash.interfaces.interface_ORCA import ORCATheory
-from  ash.interfaces.interface_TorchANI import TorchANITheory
+from ash.interfaces.interface_ORCA import ORCATheory
+from ash.interfaces.interface_TorchANI import TorchANITheory
 import ash.modules.module_coords
 
 ANGSTROM_TO_BOHR = 1.88973
