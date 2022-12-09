@@ -160,7 +160,7 @@ class SOAPCalculatorSpinv:
 # ML/MM embedding. Requires the use of a QM (or ML) engine to compute in vacuo
 # energies forces, to which those from the ML/MM model are added. For now we
 # support use of ORCA (QM) or TorchANI (ML) as the backend, but this could
-# be generalised to any supported engine.
+# be generalised to any compatible engine.
 class MLMMTheory:
     # Class attributes.
 
