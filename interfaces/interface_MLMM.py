@@ -168,7 +168,7 @@ class MLMMTheory:
     _module_dir = os.path.dirname(os.path.abspath(__file__))
 
     # Create the name of the default model file. (This is trained for the
-    # alanine dipeptide (ADP) system.
+    # alanine dipeptide (ADP) system.)
     _default_model = os.path.join(_module_dir, "mlmm_adp.mat")
 
     # ML model parameters. For now we'll hard-code our own model parameters.
