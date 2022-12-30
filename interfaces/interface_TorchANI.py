@@ -33,6 +33,8 @@ from ash.functions.functions_general import (
     BC
 )
 
+ANGSTROM_TO_BOHR = 1.88973
+
 class TorchANITheory:
 
     # Follow ASH style for constructor, where required arguments are keywords,
@@ -183,6 +185,6 @@ class TorchANITheory:
 
         # Optionally, compute the gradients too.
         else:
-            gradient = torch.autograd.grad(energy.sum(), coords)[0]
+            gradient = torch.autograd.grad(energy.sum(), coords)[0] * ANGSTROM_TO_BOHR
 
             return energy.detach().cpu().numpy()[0], gradient.cpu().numpy()[0]
