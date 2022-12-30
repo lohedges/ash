@@ -3068,7 +3068,7 @@ class OpenMM_MDclass:
                 print("Step:", step)
 
                 # Get the current simulation state from the context. Use unwrapped
-                # coordiantes, since we will wrap and recenter molecules with MDTraj.
+                # coordinates, since we will wrap and recenter molecules with MDTraj.
                 current_state = self.openmmobject.simulation.context.getState(
                     getPositions=True,
                     enforcePeriodicBox=False,
@@ -3095,7 +3095,7 @@ class OpenMM_MDclass:
                 # Image the molecules so that the solute is centered.
                 traj.image_molecules(inplace=True)
 
-                # Get back a NumPy arrray of the current positions.
+                # Get back a NumPy arrray of the current positions, in Angstrom.
                 current_coords = traj.xyz[0].astype("float64") * 10
 
                 print_time_rel(checkpoint, modulename="get OpenMM state", moduleindex=2)
