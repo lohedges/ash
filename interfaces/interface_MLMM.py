@@ -539,8 +539,6 @@ class MLMMTheory:
         dE_dxyz_bohr = (dE_dxyz_bohr_part +
                         dE_ds @ ds_dxyz_bohr.swapaxes(0,1) +
                         dE_dchi @ dchi_dxyz_bohr.swapaxes(0,1))
-        dE_dxyz = dE_dxyz_bohr * ANGSTROM_TO_BOHR
-        dE_dpc_xyz = dE_dpc_xyz_bohr * ANGSTROM_TO_BOHR
 
         # Compare energies and gradients to those obtained by QM/MM with ORCA.
         if self._comparison_frequency > 0:
@@ -584,15 +582,15 @@ class MLMMTheory:
                     delta_E_vac = E_vac - E_qm_vac
 
                     # Work out the RMSD of the gradients, both QM and PC.
-                    rmsd_qm_grad = np.sqrt(np.mean((qm_gradient - (np.array(dE_dxyz) + grad_vac))**2))
+                    rmsd_qm_grad = np.sqrt(np.mean((qm_gradient - (np.array(dE_dxyz_bohr) + grad_vac))**2))
                     rmsd_grad_vac = np.sqrt(np.mean(qm_gradient_vac - grad_vac)**2)
-                    rmsd_pc_grad = np.sqrt(np.mean((pc_gradient - np.array(dE_dpc_xyz))**2))
+                    rmsd_pc_grad = np.sqrt(np.mean((pc_gradient - np.array(dE_dpc_xyz_bohr))**2))
 
                     # Write to file.
                     with open("mlmm_vs_qmmm.txt", "a") as f:
                         f.write(f"{step} {delta_E_vac} {delta_E} {rmsd_grad_vac} {rmsd_qm_grad} {rmsd_pc_grad}\n")
 
-        return (E + E_vac, np.array(dE_dxyz) + grad_vac, np.array(dE_dpc_xyz))
+        return (E + E_vac, np.array(dE_dxyz_bohr) + grad_vac, np.array(dE_dpc_xyz_bohr))
 
     def _get_E(self, xyz_bohr, zid, s, chi, pc_xyz_bohr, MMcharges):
         return jnp.sum(self._get_E_components(xyz_bohr, zid, s, chi, pc_xyz_bohr, MMcharges))
