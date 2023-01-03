@@ -98,7 +98,8 @@ class GPRCalculator:
             n_ref = self.n_ref[i]
             ref_soap_z = self.ref_soap[i, :n_ref]
             mol_soap_z = mol_soap[zid == i, :, None]
-            K_mol_ref2 = (ref_soap_z @ mol_soap_z).squeeze() ** 2
+            K_mol_ref2 = (ref_soap_z @ mol_soap_z) ** 2
+            K_mol_ref2 = K_mol_ref2.reshape(K_mol_ref2.shape[:-1])
             result[zid == i] = K_mol_ref2 @ self.c[i, :n_ref] + self.ref_mean[i]
         if not gradient:
             return result
@@ -111,7 +112,8 @@ class GPRCalculator:
             n_ref = self.n_ref[i]
             ref_soap_z = self.ref_soap[i, :n_ref]
             mol_soap_z = mol_soap[zid == i, :, None]
-            K_mol_ref = (ref_soap_z @ mol_soap_z).squeeze()
+            K_mol_ref = (ref_soap_z @ mol_soap_z)
+            K_mol_ref = K_mol_ref.reshape(K_mol_ref.shape[:-1])
             c = self.c[i, :n_ref]
             df_dsoap[zid == i] = (K_mol_ref[:,None,:] * ref_soap_z.T) @ c * 2
         return df_dsoap
