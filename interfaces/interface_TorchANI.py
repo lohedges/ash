@@ -111,7 +111,7 @@ class TorchANITheory:
            ----------
 
            current_coords : numpy.ndarray
-               The current QM coordinates.
+               The current QM coordinates in Angstrom.
 
            charge : int
                Charge of the QM region.
@@ -120,7 +120,7 @@ class TorchANITheory:
                Spin multiplicity of the QM region.
 
            current_MM_coords : numpy.ndarray
-               The MM point-charge coordinates.
+               The MM point-charge coordinates in Angstrom.
 
            MMcharges : [ float ]
                The MM point-charge charges.
@@ -136,6 +136,15 @@ class TorchANITheory:
 
            label : str
                Job identification string.
+
+
+           Returns
+           -------
+
+           energy : float, qm_gradient (optional), pc_gradient (optional)
+               The energy in Hartree, and optionally the QM and PC gradients
+               in Hartree/Bohr.
+
         """
 
         if self._printlevel >= 2:
