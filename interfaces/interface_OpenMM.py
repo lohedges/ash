@@ -2947,7 +2947,7 @@ class OpenMM_MDclass:
             self.dataoutputoption = stdout
         self.statedatareporter=self.openmmobject.openmm.app.StateDataReporter(self.dataoutputoption, self.traj_frequency, step=True, time=True,
                                                            potentialEnergy=True, kineticEnergy=True, volume=volume,
-                                                           density=density, temperature=True, separator=',')
+                                                           density=density, temperature=True, separator=' ')
         self.openmmobject.simulation.reporters.append(self.statedatareporter)
 
         # NOTE: Better to use OpenMM-plumed interface instead??
