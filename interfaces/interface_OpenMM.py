@@ -2881,7 +2881,6 @@ class OpenMM_MDclass:
         
         self.openmmobject.update_simulation()
         print("Simulation updated.")
-        print(self.openmmobject.integrator)
         #if self.openmmobject.Periodic is True:
         #    print("PME parameters in context", self.openmmobject.nonbonded_force.getPMEParametersInContext(self.openmmobject.simulation.context))
         forceclassnames = [i.__class__.__name__ for i in self.openmmobject.system.getForces()]
