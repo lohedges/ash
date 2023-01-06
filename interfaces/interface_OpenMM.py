@@ -1084,7 +1084,7 @@ class OpenMMTheory:
     # Create/update simulation from scratch or after system has been modified (force modification or even deletion)
     #def create_simulation(self, timestep=0.001, integrator='VerletIntegrator', coupling_frequency=1,
     #                      temperature=300):
-    def update_simulation(self):
+    def update_simulation(self, seed=None):
         #Keeping variables
         timeA = time.time()
         print_line_with_subheader1("Creating/updating OpenMM simulation object")
@@ -1111,6 +1111,11 @@ class OpenMMTheory:
             self.integrator = self.openmm.LangevinMiddleIntegrator(self.temperature * self.unit.kelvin,
                                                                    self.coupling_frequency / self.unit.picosecond,
                                                                    self.timestep * self.unit.picoseconds)
+            if seed is not None:
+                self.integrator.setRandomNumberSeed(seed)
+
+            # Print the random number seed.
+            print(f"Integrator random number seed: {self.integrator.getRandomNumberSeed()}")
         elif self.integrator_name == 'NoseHooverIntegrator':
             self.integrator = self.openmm.NoseHooverIntegrator(self.temperature * self.unit.kelvin,
                                                                self.coupling_frequency / self.unit.picosecond,
@@ -2654,7 +2659,8 @@ def OpenMM_MD(fragment=None, theory=None, timestep=0.004, simulation_steps=None,
               anderson_thermostat=False,
               enforcePeriodicBox=True, dummyatomrestraint=False, center_on_atoms=None, solute_indices=None,
               datafilename=None, dummy_MM=False, plumed_object=None, add_center_force=False,
-              center_force_atoms=None, centerforce_constant=1.0, barostat_frequency=25, specialbox=False):
+              center_force_atoms=None, centerforce_constant=1.0, barostat_frequency=25, specialbox=False,
+              seed=None):
     print_line_with_mainheader("OpenMM MD wrapper function")
     md = OpenMM_MDclass(fragment=fragment, theory=theory, charge=charge, mult=mult, timestep=timestep,
                         traj_frequency=traj_frequency, temperature=temperature, integrator=integrator,
@@ -2664,7 +2670,7 @@ def OpenMM_MD(fragment=None, theory=None, timestep=0.004, simulation_steps=None,
                         datafilename=datafilename, dummy_MM=dummy_MM,
                         plumed_object=plumed_object, add_center_force=add_center_force,trajfilename=trajfilename,
                         center_force_atoms=center_force_atoms, centerforce_constant=centerforce_constant,
-                        barostat_frequency=barostat_frequency, specialbox=specialbox)
+                        barostat_frequency=barostat_frequency, specialbox=specialbox, seed=seed)
     if simulation_steps is not None:
         md.run(simulation_steps=simulation_steps)
     elif simulation_time is not None:
@@ -2683,8 +2689,13 @@ class OpenMM_MDclass:
                  enforcePeriodicBox=True, dummyatomrestraint=False, center_on_atoms=None, solute_indices=None,
                  datafilename=None, dummy_MM=False, plumed_object=None, add_center_force=False,
                  center_force_atoms=None, centerforce_constant=1.0,
-                 barostat_frequency=25, specialbox=False):
+                 barostat_frequency=25, specialbox=False, seed=None):
         module_init_time = time.time()
+
+        # Validate the seed.
+        if seed is not None:
+            if type(seed) is not int:
+                raise TypeError("'seed' must be of type 'int'.")
 
         print_line_with_mainheader("OpenMM Molecular Dynamics Initialization")
 
@@ -2879,7 +2890,7 @@ class OpenMM_MDclass:
             self.openmmobject.set_simulation_parameters(timestep=self.timestep, temperature=self.temperature, 
                                                         integrator=self.integrator, coupling_frequency=self.coupling_frequency)
         
-        self.openmmobject.update_simulation()
+        self.openmmobject.update_simulation(seed=seed)
         print("Simulation updated.")
         #if self.openmmobject.Periodic is True:
         #    print("PME parameters in context", self.openmmobject.nonbonded_force.getPMEParametersInContext(self.openmmobject.simulation.context))
