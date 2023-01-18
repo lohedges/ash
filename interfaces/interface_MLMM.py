@@ -66,7 +66,7 @@ SPHERICAL_EXPANSION_HYPERS_COMMON = {
     'global_species': SPECIES
 }
 
-Z_DICT = {'H': 1, 'C': 6, 'N': 7, 'O': 8, 'S': 19}
+Z_DICT = {'H': 1, 'C': 6, 'N': 7, 'O': 8, 'S': 16}
 SPECIES_DICT = {1: 0, 6: 1, 7: 2, 8: 3, 16: 4}
 
 class GPRCalculator:
