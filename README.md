@@ -14,7 +14,7 @@ PySCF, Dalton, CFour, MRCC.
 
 ## ML/MM functionality
 
-Baed on [code](https://github.com/emedio/embedding) by Kirill Zinovjev for the paper
+Based on [code](https://github.com/emedio/embedding) by Kirill Zinovjev for the paper
 "Electrostatic Embedding of Machine Learning Potentials", which is available
 [here](https://chemrxiv.org/engage/chemrxiv/article-details/6317807d49042a7e1ccde60f).
 
