@@ -38,7 +38,7 @@ comparisons between QM/MM energies computed by ORCA to the ML/MM predictions,
 then make sure that the `PATH` and `LD_LIBRARY_PATH` environment variables within
 the `set_environment_ash.sh` script are updated to reflect your local [ORCA](https://www.orcasoftware.de/tutorials_orca/) installation.)
 
-(For GPU functionality, you will need to install appropriate CUDA drivers on
+For GPU functionality, you will need to install appropriate CUDA drivers on
 your host system along with NVCC, the CUDA compiler driver. (This doesn't come
 with `cudatoolkit` from `conda-forge`.)
 
